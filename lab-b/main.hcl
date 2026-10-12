@@ -1,6 +1,6 @@
 resource "lab" "main" {
-  title       = "VC test (throwaway)"
-  description = "This is the Skeleton Lab.  \nYou can use this as a minimal starting point for developing labs. Version one."
+  title       = "Mono B (throwaway)"
+  description = "This is the Skeleton Lab.  \nYou can use this as a minimal starting point for developing labs. Monorepo lab B."
 
   # timelimit and idle are both required on every lab.
   settings {
