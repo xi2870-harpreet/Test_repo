@@ -1,6 +1,6 @@
 resource "lab" "main" {
   title       = "VC test (throwaway)"
-  description = "This is the Skeleton Lab.  \nYou can use this as a minimal starting point for developing labs. Version one."
+  description = "This is the Skeleton Lab.  \nYou can use this as a minimal starting point for developing labs. Version one. Version two on a branch."
 
   # timelimit and idle are both required on every lab.
   settings {
