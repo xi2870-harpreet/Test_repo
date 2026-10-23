@@ -1,0 +1,28 @@
+version: "3"
+containers:
+- name: cloud-client
+  image: gcr.io/instruqt/cloud-client
+  shell: /bin/bash
+  ports:
+  - 80
+  memory: 1024
+virtualbrowsers:
+- name: vbt
+  url: https://signin.aws.amazon.com/console
+virtualmachines:
+- name: ubuntu
+  image: ubuntu-os-cloud/ubuntu-2404-noble-amd64-v20241004
+  memory: 8192
+  cpus: 2
+  allow_external_ingress:
+  - https
+  - http
+  - high-ports
+aws_accounts:
+- name: example
+  managed_policies:
+  - arn:aws:iam::aws:policy/AdministratorAccess
+  - arn:aws:iam::aws:policy/AmazonBedrockFullAccess
+  admin_managed_policies:
+  - arn:aws:iam::aws:policy/AdministratorAccess
+  - arn:aws:iam::aws:policy/AmazonBedrockFullAccess
