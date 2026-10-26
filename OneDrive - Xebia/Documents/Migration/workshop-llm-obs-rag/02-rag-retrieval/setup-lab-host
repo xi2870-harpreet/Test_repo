@@ -1,0 +1,35 @@
+#!/bin/bash
+set -x
+
+echo "Running challenge setup script"
+
+echo "Setting up for 02-rag-retrieval"
+
+# Ensure docker compose commands run from the lab directory.
+cd /root/lab || exit 1
+
+# set up aliases for lab commands
+if ! grep -q "# BEGIN_RAG_RETRIEVAL_ALIASES" /root/.bashrc; then
+    tee -a /root/.bashrc <<EOF
+# BEGIN_RAG_RETRIEVAL_ALIASES
+# Lab commands
+alias api-enable-llm-obs='bash /root/scripts/api-enable-llm-obs.sh'
+alias add-query-embedding='bash /root/scripts/add-query-embedding.sh'
+alias add-document-retrieval='bash /root/scripts/add-document-retrieval.sh'
+alias add-rag-llm-call='bash /root/scripts/add-rag-llm-call.sh'
+alias fix-vector-store='bash /root/scripts/fix-vector-store.sh'
+alias use-semantic-chunking='bash /root/scripts/use-semantic-chunking.sh'
+# END_RAG_RETRIEVAL_ALIASES
+EOF
+else
+    echo "RAG retrieval alias block already exists; skipping append"
+fi
+
+# set up challenge files
+echo "📄 Copying files to set up initial state for second challenge"
+cp /root/lab_states/02-rag-retrieval/config.py /root/lab/backend_api/app/config.py
+cp -f /root/lab_states/02-rag-retrieval/docker-compose.yml /root/lab/
+cp -r /root/lab_states/02-rag-retrieval/kb-service /root/lab/
+
+# start services
+docker compose down && docker compose up -d

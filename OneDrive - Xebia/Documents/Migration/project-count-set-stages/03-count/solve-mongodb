@@ -1,0 +1,39 @@
+#!/bin/env python3
+import logging
+import subprocess
+
+from mdb_edu import utils
+
+LOCAL_MODE = None
+
+if __name__ == "__main__":
+    try:
+        logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
+
+        utils.load_agents_var_file()
+
+        slug = utils.slug
+        challenge_id = utils.challengeID
+        track_id = utils.trackID
+        participant_id = utils.participantID
+
+        utils.print_script_start_message(__file__)
+        utils.logging.info("============")
+
+        cs = utils.get_var("CONNECTION_STRING")
+        solve_script = utils.get_var("SOLVE_SCRIPT")
+
+        command = f"mongosh {cs} --file {solve_script} --quiet".split()
+        utils.run_command(command,"Something went wrong when executing the solve.js script")
+
+        utils.success_message_logging_and_continue("Completed script execution")
+
+        utils.logging.info("============")
+        utils.print_script_closing_message(__file__)
+
+    except FileNotFoundError as err:
+        FILE_ERR = "FAIL: The file was not found. Please make sure to create it."
+        utils.error_message_logging_and_exit(FILE_ERR, err=err)
+    except Exception as err:
+        err_msg = f"FAIL: Unusual error caused by exception {err}"
+        utils.error_message_logging_and_exit(err_msg, err)

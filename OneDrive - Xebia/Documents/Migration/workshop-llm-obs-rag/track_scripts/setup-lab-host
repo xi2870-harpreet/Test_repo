@@ -1,0 +1,101 @@
+#!/bin/bash
+set -x
+
+# For `instruqt track log` context
+echo "Setting up environment for ${INSTRUQT_TRACK_SLUG}"
+
+# Wait for the Instruqt host bootstrap to finish
+until [ -f /opt/instruqt/bootstrap/host-bootstrap-completed ]
+do
+    sleep 0.5
+done
+
+# Download the track's files from GCP object storage and untar them into /root
+echo "Setting up assets"
+BUCKET="learning-center-files"
+if [[ ${INSTRUQT_TRACK_SLUG: -4} == '-dev' ]]
+then
+  BUCKET="learning-center-files-dev"
+fi
+wget https://storage.googleapis.com/${BUCKET}/${INSTRUQT_TRACK_SLUG}.tar -O - | \
+tar -x --no-same-owner -C /root/
+
+### Your global track customizations below this line ###
+
+# -----------------------------------------------------------------------------
+# Set up trial account credentials
+# -----------------------------------------------------------------------------
+echo "Setting up trial account credentials"
+echo "Download and install lc-env"
+wget "${LEARNING_CENTER_ASSETS_URL}/lc-cli/v1/latest/lc-env-linux-amd64" \
+  --output-document=/usr/bin/lc-env --quiet
+chmod +x /usr/bin/lc-env
+
+echo "Configuring lc-env for the lab"
+lc-env config \
+  --secret "${LEARNING_CENTER_API_ACCESS_TOKEN}" \
+  --lc-user-id "${INSTRUQT_USER_ID:-$_SANDBOX_ID}" \
+  --lab-context workshop-build-with-llm-obs \
+  --lc-api-url "${LEARNING_CENTER_ENDPOINT}" \
+  --parent-org 'cet-us1'
+
+echo "Provision or get user credentials"
+lc-env init user --quiet
+
+echo "Export credentials to bashrc"
+lc-env show-dd-credentials --export >> /root/.bashrc
+
+# Save environment variables to .bashrc
+tee -a /root/.bashrc <<EOF
+alias show-dd-credentials="lc-env show-dd-credentials"
+alias creds="lc-env show-dd-credentials"
+alias resetorg="lc-env reset --no-credentials"
+
+# Set lab variables
+export WEBSITE_URL=https://${HOSTNAME}-80-${INSTRUQT_PARTICIPANT_ID}.env.play.instruqt.com/
+
+# Chatbot configuration
+export STREAMLIT_PORT=8501
+export STREAMLIT_URL=0.0.0.0
+
+# LLM configuration
+export LLM_PORT=11434
+export LLM_BASE_URL=http://locallama
+export LLM_MODEL=llama3.2:1b
+
+# Backend configuration
+export FASTAPI_BASE_URL=http://api
+export FASTAPI_PORT=8000
+export FASTAPI_HOST=0.0.0.0
+
+# Text-embedder Configuration
+export EMBED_MODEL=nomic-embed-text:v1.5
+export EMBED_BASE_URL=http://text-embedder
+export EMBED_PORT=11435
+
+# Ollama Configuration
+export OLLAMA_DEFAULT_PORT=11434
+export OPENAI_API_KEY=sk-locallama123
+
+# ChromaDB Configuration
+export CHROMADB_PORT=8001
+
+# Datadog Configuration
+export DD_ENV=llm-obs-getting-started
+export DD_LLMOBS_ENABLED=1
+export DD_LLMOBS_ML_APP=quantum-hound
+export DD_LLMOBS_AGENTLESS_ENABLED=1
+
+# Lab commands
+alias update-system-prompt='bash /root/scripts/update-system-prompt.sh'
+alias automate-requests='bash /root/scripts/automate-requests.sh'
+alias add-kb-services='bash /root/scripts/add-kb-services.sh'
+alias instrument-kb-service='bash /root/scripts/instrument-kb-service.sh'
+alias embed-kb-docs='bash /root/scripts/embed-kb-docs.sh'
+
+# show credentials in lab terminal
+[[ \$- == *i* ]] && lc-env show-dd-credentials || true
+cd /root/lab
+EOF
+
+source /root/.bashrc

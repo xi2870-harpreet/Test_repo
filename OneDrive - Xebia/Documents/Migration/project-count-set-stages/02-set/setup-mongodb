@@ -1,0 +1,18 @@
+#!/bin/bash
+#
+# This script runs when the platform setup the challenge.
+#
+# The platform determines if the script was successful using the exit code of this
+# script. If the exit code is not 0, the script fails. 
+#
+
+source /scripts/lib.sh
+setup_challenge
+
+get_var DB_NAME
+get_var COLLECTION_NAME
+get_var BIRDS_COLLECTION_NAME
+set_var SOLVED_DIR "/app/${INSTRUQT_TRACK_SLUG}/solved/${CHALLENGE_IDX}"
+set_var SOLVE_SCRIPT "${SOLVED_DIR}/solve.js"
+
+exit 0

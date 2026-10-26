@@ -1,0 +1,55 @@
+#!/bin/bash
+set -x
+
+echo "Running challenge setup script"
+echo "Setting up for 01-rag-knowledge-base"
+
+# Ensure docker compose commands run from the lab directory.
+cd /root/lab || exit 1
+
+# Any runtime variables you would like to reference in instructions
+agent variable set LABVAR_ENV ${DD_ENV}
+agent variable set LABVAR_WEBSITE_URL ${WEBSITE_URL}
+
+# start services
+if ! docker compose up -d; then
+    echo "ERROR: docker compose up failed"
+    exit 1
+fi
+
+# Wait for an endpoint to become healthy with a timeout.
+wait_for_endpoint() {
+    local service_name="$1"
+    local url="$2"
+    local timeout="$3"
+    local elapsed=0
+
+    echo "Waiting for ${service_name} to start..."
+    # curl -f treats HTTP 4xx/5xx as failures; -sS keeps output quiet but still
+    # shows errors when a request fails.
+    while ! curl -fsS "${url}" > /dev/null; do
+        sleep 1
+        elapsed=$((elapsed + 1))
+        if [ "${elapsed}" -ge "${timeout}" ]; then
+            echo "ERROR: ${service_name} failed to start after ${timeout} seconds"
+            return 1
+        fi
+    done
+
+    echo "${service_name} is ready"
+    return 0
+}
+
+if ! wait_for_endpoint "LLM service" "http://localhost:11434/v1/models" 300; then
+    exit 1
+fi
+
+if ! wait_for_endpoint "FastAPI service" "http://localhost:8000/health" 180; then
+    exit 1
+fi
+
+echo "All services are ready"
+
+mkdir -p /root/logs
+echo "Running automated LLM requests..."
+nohup python3 /root/scripts/automated_llm_requests.py "$@" >/dev/null 2>&1 &

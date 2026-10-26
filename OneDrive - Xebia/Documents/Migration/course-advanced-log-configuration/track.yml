@@ -1,0 +1,34 @@
+slug: course-advanced-log-configuration
+id: p71fvstol587
+title: Advanced Log Configuration
+teaser: Learn to fix common log collection issues, such as multi-line logs, log parsing,
+  and filtering.
+description: |
+  In this track, you will learn how to fix common log collection issues, such as multi-line logs, log parsing, and filtering.
+icon: https://storage.googleapis.com/instruqt-frontend/img/tracks/default.png
+tags:
+- log management
+- log parsing
+- logs
+- log filtering
+- log collection
+- course
+owner: datadog
+developers: []
+show_timer: true
+idle_timeout: 600
+timelimit: 7200
+lab_config:
+  extend_ttl: 1800
+  sidebar_enabled: true
+  feedback_recap_enabled: true
+  feedback_tab_enabled: false
+  loadingMessages: false
+  theme:
+    name: original
+  override_challenge_layout: false
+  hideStopButton: false
+  default_layout: AssignmentRight
+  default_layout_sidebar_size: 40
+checksum: "16261694472229545257"
+enhanced_loading: false

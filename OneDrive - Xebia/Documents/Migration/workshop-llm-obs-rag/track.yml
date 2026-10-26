@@ -1,0 +1,29 @@
+slug: workshop-llm-obs-rag
+id: nfzycghumchw
+title: Agent Observability for RAG Workflows
+teaser: Press the "Launch" button to start loading the lab.
+description: |
+  Describe what this lab is about. This will only display on play.instruqt.com.
+icon: https://storage.googleapis.com/instruqt-frontend/img/tracks/default.png
+tags:
+- ai
+- agent observability
+- workshop
+owner: datadog
+developers: []
+show_timer: true
+skipping_enabled: true
+idle_timeout: 3600
+timelimit: 14400
+lab_config:
+  extend_ttl: 1800
+  sidebar_enabled: true
+  feedback_recap_enabled: true
+  feedback_tab_enabled: false
+  loadingMessages: false
+  override_challenge_layout: true
+  hideStopButton: false
+  default_layout: AssignmentRight
+  default_layout_sidebar_size: 40
+checksum: "4036661387037856994"
+enhanced_loading: false

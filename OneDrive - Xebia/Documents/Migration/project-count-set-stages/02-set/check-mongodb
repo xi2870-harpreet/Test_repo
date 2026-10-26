@@ -1,0 +1,62 @@
+#!/bin/env python3
+import logging
+
+from mdb_edu import utils
+
+LOCAL_MODE = None
+
+# Tooling constants
+MONGOSH = r"mongosh"
+PYTHON3 = r"python3"
+BASH = r"bash"
+EXPECTED_INSTALLED_TOOLS = dict([(MONGOSH, MONGOSH), (PYTHON3, PYTHON3), (BASH, BASH)])
+
+# Challenge specific constants
+DB_NAME = utils.get_var("DB_NAME")
+COLLECTION_NAME = utils.get_var("BIRDS_COLLECTION_NAME")
+CLUSTER_NAME = utils.get_var("CLUSTER_NAME")
+
+# Correct command
+MONGOSH_COMMAND = f"db.{COLLECTION_NAME}.aggregate()"
+LOG_ENTRY = {
+    "method": "aggregate",
+    "class": "Collection",
+    "db": "bird_data",
+    "coll": "birds",
+    "arguments": {
+      "options": {},
+      "pipeline": [
+        {
+          "$set": {
+            "class": "bird"
+          }
+        }
+      ]
+    }
+  }
+
+if __name__ == "__main__":
+    try:
+        logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
+
+        utils.load_agents_var_file()
+
+        utils.print_script_start_message(__file__)
+
+        slug = utils.slug
+        challenge_id = utils.challengeID
+        track_id = utils.trackID
+        participant_id = utils.participantID
+
+        utils.check_tools_installed(EXPECTED_INSTALLED_TOOLS)
+
+        SUCCESS_MSG = f"PASS: Found a log entry for the '{MONGOSH_COMMAND}' command"
+        ERR_MSG = f"FAIL: Could not find a log entry for the '{MONGOSH_COMMAND}' command. Please review steps 1 to 3 and try again."
+        result = utils.run_find_attr(LOG_ENTRY, SUCCESS_MSG, ERR_MSG)
+        logging.info(result)
+
+        utils.print_script_closing_message(__file__)
+
+    except Exception as err:
+        err_msg = f"FAIL: Unusual error caused by exception {err}"
+        utils.error_message_logging_and_exit(err_msg, err=err)

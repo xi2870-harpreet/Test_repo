@@ -1,0 +1,104 @@
+#!/bin/bash
+set -x
+
+# For `instruqt track log` context
+echo "Setting up environment for ${INSTRUQT_TRACK_SLUG}"
+
+# Wait for the Instruqt host bootstrap to finish
+until [ -f /opt/instruqt/bootstrap/host-bootstrap-completed ]
+do
+    sleep 0.5
+done
+
+# Download the track's files from GCP object storage and untar them into /root
+echo "Downloading lab files from GCP"
+BUCKET="learning-center-files"
+if [[ ${INSTRUQT_TRACK_SLUG: -4} == '-dev' ]]
+then
+  BUCKET="learning-center-files-dev"
+fi
+wget https://storage.googleapis.com/${BUCKET}/${INSTRUQT_TRACK_SLUG}.tar \
+  --output-document=- --quiet | \
+  tar -x --no-same-owner --directory=/root/
+
+# Download and install lc-env
+echo "Download and install lc-env"
+wget "${LEARNING_CENTER_ASSETS_URL}/lc-cli/v1/latest/lc-env-linux-amd64" \
+  --output-document=/usr/bin/lc-env --quiet
+chmod +x /usr/bin/lc-env
+
+# Configure lc-env for the lab
+echo "Configuring lc-env for the lab"
+lc-env config \
+  --secret "${LEARNING_CENTER_API_ACCESS_TOKEN}" \
+  --lc-user-id "${INSTRUQT_USER_ID:-$_SANDBOX_ID}" \
+  --lab-context learning-center \
+  --lc-api-url "${LEARNING_CENTER_ENDPOINT}" \
+  --parent-org 'cet-us1'
+
+# Provision or get user credentials
+echo "Provision or get user credentials"
+lc-env init user --quiet
+
+# Export credentials to bashrc (DD_API_KEY, DD_APP_KEY, DD_SITE)
+echo "Export credentials to bashrc"
+lc-env show-dd-credentials --export >> /root/.bashrc
+
+# Configure RUM app
+eval "$(lc-env show-dd-credentials --export)"
+echo "Configuring RUM app"
+source configrum Storedog
+
+# Save aliases and environment variables to .bashrc
+cat >> /root/.bashrc <<EOF
+alias show-dd-credentials="lc-env show-dd-credentials"
+alias resetorg="lc-env reset --no-credentials"
+alias creds="lc-env show-dd-credentials"
+alias finish='touch /root/done'
+
+export DD_ENV=advanced-log-configuration
+export DD_HOSTNAME=advanced-log-configuration-host
+export DD_VERSION="1.0.0"
+
+export DD_APPLICATION_ID=$DD_APPLICATION_ID
+export DD_CLIENT_TOKEN=$DD_CLIENT_TOKEN
+
+# Output the credentials in interactive shells only
+[[ \$- == *i* ]] && lc-env show-dd-credentials
+cd /root/lab
+EOF
+
+source /root/.bashrc
+
+### Lab-specific startup ###
+
+# expose storedog to IDE so you can see the application files
+ln -s /opt/datadog-training/storedog /root/lab/storedog
+
+# take files pulled in from GCP and overwrite the default Storedog files
+cp /root/discounts.py /opt/datadog-training/storedog/services/discounts/discounts.py
+
+# Set variables for Storedog
+# Overrides the version built into the vm image; see labs/files/setup-storedog.sh
+# https://github.com/DataDog/training-images/blob/main/instruqt-host-images/generic-course/files/setup-storedog.sh
+source /root/setup-storedog.sh
+
+# Instruqt issues the certificate; the NGINX container mounts and serves it.
+echo "Fetching Instruqt SSL certificate"
+METADATA_URL="http://metadata.google.internal/computeMetadata/v1/instance/attributes"
+mkdir -p /root/certs
+until curl -sf -H "Metadata-Flavor: Google" \
+  "${METADATA_URL}/ssl-certificate" -o /root/certs/cert.pem; do
+  sleep 5
+done
+curl -sf -H "Metadata-Flavor: Google" \
+  "${METADATA_URL}/ssl-certificate-key" -o /root/certs/key.pem
+chmod 600 /root/certs/key.pem
+
+# Set runtime variables for assignment instructions after Storedog defines its HTTPS URL.
+echo "Setting runtime variables"
+agent variable set LABVAR_ENV "${DD_ENV}"
+agent variable set LABVAR_STOREDOG_URL "${STOREDOG_URL}"
+
+# Start Storedog after writing the HTTPS endpoint configuration used at frontend build time.
+docker compose up -d

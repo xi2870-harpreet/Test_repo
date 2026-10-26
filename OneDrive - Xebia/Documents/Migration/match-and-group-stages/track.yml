@@ -1,0 +1,36 @@
+slug: match-and-group-stages
+id: 9swum6x9iuhs
+title: $match and $group Stages
+teaser: Learn how to use the $match and $group aggregation stages in MongoDB.
+description: In this lab, you will learn how to use the $match and $group aggregation
+  stages in MongoDB.
+icon: https://d3cy9zhslanhfa.cloudfront.net/media/3800C044-6298-4575-A05D5C6B7623EE37/210951AB-404B-4175-BD0718F6E418FD49/webimage-3C76A23A-64C7-4BCF-8B7AD04768A00E27.png
+tags:
+- aggregation
+- catalina-core
+- unit7
+- mongodb
+- unit7-lesson2
+- local-mongod
+- catalina
+owner: mongodb
+developers:
+- julie.gauthier@mongodb.com
+- eoin.brazil@mongodb.com
+- davenson.lombard@mongodb.com
+show_timer: true
+idle_timeout: 300
+sandbox_preset: cl-mongodb-1024
+lab_config:
+  sidebar_enabled: true
+  feedback_recap_enabled: true
+  feedback_tab_enabled: false
+  loadingMessages:
+  - Dive into our Docs to learn about MongoDB queries and more.
+  - Build skills for your future at learn.mongodb.com.
+  - Earn free Skill Badges at learn.mongodb.com/skills
+  hideStopButton: false
+  default_layout: AssignmentRight
+  default_layout_sidebar_size: 33
+checksum: "2052654134331673067"
+enhanced_loading: false

@@ -1,0 +1,15 @@
+version: "3"
+virtualmachines:
+- name: lab-host
+  image: datadog-community/generic-course-1-0-0
+  shell: /bin/bash
+  machine_type: n2-standard-2
+  allow_external_ingress:
+  - http
+  - https
+  - high-ports
+  provision_ssl_certificate: true
+secrets:
+- name: LEARNING_CENTER_API_ACCESS_TOKEN
+- name: LEARNING_CENTER_ENDPOINT
+- name: LEARNING_CENTER_ASSETS_URL

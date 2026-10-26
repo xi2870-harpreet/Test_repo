@@ -1,0 +1,10 @@
+version: "3"
+virtualmachines:
+- name: lab-host
+  image: datadog-community/workshop-llm-obs-v2-lab-host-2-0-1
+  shell: /bin/bash
+  machine_type: e2-highcpu-8
+secrets:
+- name: LEARNING_CENTER_API_ACCESS_TOKEN
+- name: LEARNING_CENTER_ENDPOINT
+- name: LEARNING_CENTER_ASSETS_URL
