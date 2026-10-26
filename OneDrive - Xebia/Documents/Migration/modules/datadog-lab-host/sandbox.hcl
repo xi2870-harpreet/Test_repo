@@ -27,10 +27,13 @@ resource "container" "lab_host" {
   entrypoint = ["/bin/bash"]
   command    = ["-c", "sleep infinity"]
 
+  # SECURITY: Do NOT expose LEARNING_CENTER_API_ACCESS_TOKEN here.
+  # The API token grants backend access and must not be visible to lab users
+  # via terminal env inspection. Pass it only to the exec setup step below.
+  # Only non-sensitive runtime URLs are kept in the container environment.
   environment = {
-    LEARNING_CENTER_API_ACCESS_TOKEN = var.learning_center_api_token
-    LEARNING_CENTER_ENDPOINT         = var.learning_center_endpoint
-    LEARNING_CENTER_ASSETS_URL       = var.learning_center_assets_url
+    LEARNING_CENTER_ENDPOINT   = var.learning_center_endpoint
+    LEARNING_CENTER_ASSETS_URL = var.learning_center_assets_url
   }
 
   resources {
@@ -47,4 +50,10 @@ resource "exec" "lab_host_setup" {
   target  = resource.container.lab_host
   script  = "scripts/exec/lab_host_setup/script.sh"
   timeout = "600s"
+
+  # API token is passed only to this privileged setup step, not persisted
+  # in the container's environment after setup completes.
+  environment = {
+    LEARNING_CENTER_API_ACCESS_TOKEN = var.learning_center_api_token
+  }
 }
