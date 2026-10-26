@@ -5,7 +5,9 @@
 resource "terminal" "mongosh" {
   target = resource.container.mongodb
   shell  = "/bin/bash"
-  cmd    = "mongosh"
+  # The mongodb-image ships /scripts/mongosh.sh which connects with the
+  # correct connection string and auth credentials set during setup.
+  cmd    = "/scripts/mongosh.sh"
 }
 
 resource "terminal" "bash" {

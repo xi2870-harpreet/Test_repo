@@ -12,19 +12,17 @@ resource "network" "main" {
 
 resource "container" "mongodb" {
   image {
-    name = "mongo:7.0"
+    # MongoDB's custom image with mongosh, /scripts/lib.sh, local_mongod.sh,
+    # and the mdb_edu Python package pre-installed.
+    # Source: mongodb sandbox-preset cl-mongodb-1024
+    name = "europe-west1-docker.pkg.dev/curriculum-labs/prod/mongodb-image:v0.8.0"
   }
 
-  entrypoint = ["/bin/bash"]
-  command    = ["-c", "mongod --fork --logpath /var/log/mongod.log --bind_ip_all && sleep infinity"]
-
-  environment = {
-    MONGO_INITDB_DATABASE = "admin"
-  }
+  environment = {}
 
   resources {
-    cpu    = 2000
-    memory = 2048
+    cpu    = 1000
+    memory = 1024
   }
 
   network {
@@ -32,8 +30,6 @@ resource "container" "mongodb" {
   }
 }
 
-resource "exec" "mongod_setup" {
-  target  = resource.container.mongodb
-  script  = "scripts/exec/mongod_setup/script.sh"
-  timeout = "300s"
-}
+# NOTE: mongod startup, user creation and dataset import are handled by the
+# per-lab task setup scripts (which call /scripts/lib.sh + local_mongod.sh
+# from inside the image). No module-level exec is needed here.
