@@ -1,6 +1,6 @@
 resource "activity" "check_project" {
   title  = "Use $project to reshape documents"
-  target = module.sandbox.output.container
+  target = resource.container.mongodb
 
   check {
     script  = "scripts/activity/project/check.sh"
@@ -17,7 +17,7 @@ resource "activity" "check_project" {
 
 resource "activity" "check_set" {
   title  = "Use $set to add a computed field"
-  target = module.sandbox.output.container
+  target = resource.container.mongodb
 
   check {
     script  = "scripts/activity/set/check.sh"
@@ -34,7 +34,7 @@ resource "activity" "check_set" {
 
 resource "activity" "check_count" {
   title  = "Use $count to count documents"
-  target = module.sandbox.output.container
+  target = resource.container.mongodb
 
   check {
     script  = "scripts/activity/count/check.sh"

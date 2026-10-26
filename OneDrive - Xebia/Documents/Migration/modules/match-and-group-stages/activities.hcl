@@ -1,6 +1,6 @@
 resource "activity" "check_match_group" {
   title  = "Run the aggregation pipeline with $match and $group"
-  target = module.sandbox.output.container
+  target = resource.container.mongodb
 
   check {
     script  = "scripts/activity/check.sh"
