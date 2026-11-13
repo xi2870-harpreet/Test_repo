@@ -118,3 +118,4 @@ Source: Instruqt's internal lab builder rulebook (paraphrased; internal only, do
 - **Idle timeout destroys the session** (30 min). Do not leave a play-test unattended if you need to inspect the UI.
 - **Slow lab logs:** `instruqt lab logs` takes minutes. Run it in the background to a file.
 - **Not verified:** shop tab and Honeycomb tab rendering. Honeycomb needs the learner's own login.
+- **Play-test result (o11ycon):** all 19 containers up, shop HTTP 200, terminal opens in `/root/opentelemetry-demo`, Honeycomb login page loads in the virtual browser. First-start about 11 min end to end. If a virtual browser tab is opened before the app is listening it shows `ERR_CONNECTION_REFUSED`; Reload fixes it. Consider making the setup exec the last thing that must finish before learners enter (it already is).
