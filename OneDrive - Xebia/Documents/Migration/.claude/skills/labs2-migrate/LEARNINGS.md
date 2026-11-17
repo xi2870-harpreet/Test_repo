@@ -119,3 +119,12 @@ Source: Instruqt's internal lab builder rulebook (paraphrased; internal only, do
 - **Slow lab logs:** `instruqt lab logs` takes minutes. Run it in the background to a file.
 - **Not verified:** shop tab and Honeycomb tab rendering. Honeycomb needs the learner's own login.
 - **Play-test result (o11ycon):** all 19 containers up, shop HTTP 200, terminal opens in `/root/opentelemetry-demo`, Honeycomb login page loads in the virtual browser. First-start about 11 min end to end. If a virtual browser tab is opened before the app is listening it shows `ERR_CONNECTION_REFUSED`; Reload fixes it. Consider making the setup exec the last thing that must finish before learners enter (it already is).
+
+## GCP cloud account (gcp-cloud-account-copy-hp, 2026-11-17)
+- Labs resource is `google_project` (name 4+ chars), with `regions`, `services` (full API names like `compute.googleapis.com`), at least one `user "<name>" { roles }`, optional `service_account "<name>" { roles }`. Computed: `project_id`, `user.N.email|password`, `service_account.N.email|key` (positional index, not label).
+- Credentials tab: `cloud_credentials { google_project { target = resource.google_project.x  users = ["student"] } }` (user **names**). This syntax is not in the docs; it validated and works at Play. Shows project ID, email, password.
+- The Track cloud-client container is NOT pre-authenticated in Labs. Add a `service_account` block, pass `service_account.0.key` and `project_id` to the container `environment`, and in the setup exec run `gcloud auth activate-service-account --key-file=...` + `gcloud config set project`. The key is the JSON itself and fits in an env var.
+- Track `regions:` were `us-central1` only but the solve created a VM in `europe-west1-b`; the lab allows both. Check track scripts against `regions` during triage.
+- The aws/google cloud-account start bug is fixed: lab starts, credentials resolve, VM created by Solve (RUNNING, `n1-standard-1`).
+- Result: Check failed with the failure message, Solve for me created `myinstance` ("Solved for you"), Credentials tab populated, Console tab shows the Google sign-in page (credentials not typed in). Start to Enter lab about 5 min.
+- Click targets in the instructions panel move when the failure message appears; re-screenshot before clicking Solve for me.
