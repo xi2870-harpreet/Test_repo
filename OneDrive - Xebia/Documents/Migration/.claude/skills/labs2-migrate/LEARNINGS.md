@@ -128,3 +128,10 @@ Source: Instruqt's internal lab builder rulebook (paraphrased; internal only, do
 - The aws/google cloud-account start bug is fixed: lab starts, credentials resolve, VM created by Solve (RUNNING, `n1-standard-1`).
 - Result: Check failed with the failure message, Solve for me created `myinstance` ("Solved for you"), Credentials tab populated, Console tab shows the Google sign-in page (credentials not typed in). Start to Enter lab about 5 min.
 - Click targets in the instructions panel move when the failure message appears; re-screenshot before clicking Solve for me.
+
+## Azure subscription (azure-starter-track, 2026-11-18)
+- Labs resource is `azure_subscription` with `regions`, `services` (e.g. `Microsoft.Compute`), `user "<name>" { roles }`, optional `service_principal "<name>" { roles }`. Computed: `subscription_id`, `tenant_id`, `user.N.username|password`, `service_principal.N.app_id|password` (positional index). The docs do not define `client_id`/`client_secret`; use `app_id` and `password`.
+- `exec` accepts `environment = { ... }`, so the setup script can receive `ARM_*` values from the lab through module variables (validated).
+- `cloud_credentials { azure_subscription { target users } }` validates (syntax guessed from the AWS and GCP forms).
+- **Start failure (platform side, not config):** Play fails with "Lab failed to start" and error details `PUT https://azureaccountspoolprod.blob.core.windows.net/azureaccountsprod-lock/team-<id>.lock` -> `403 AuthorizationPermissionMismatch`. The Azure account pool cannot write its lock blob for the team. Validate, import and module publish are all clean, so this only shows at Play. Seen with team instruqt-support on 2026-11-18. Not fixable from the lab; report to Instruqt engineering with the error details and treat Azure tracks as blocked at runtime until it is fixed. Triage rule: always play-test, and say so when the account pool is the blocker.
+- Build tip: a very large bash command with several heredocs failed to parse as one command; write files one by one instead.
