@@ -17,6 +17,9 @@ tags: [labs2, session, timeout, duration, extend, limits]
 ## Rule
 There is no "unlimited" total session time. The `Duration` setting accepts any value the author needs, including very large ones such as 500 hours, and Support told a customer there was no issue with that. `Extend` lets a learner add time once during a session.
 
+## Empty Duration
+A lab needs a time limit. A lab with an empty Duration used to fail to start; Engineering released a fix (reported in ticket 4534, closed 2026-11-23) so it now starts with a default 15-minute limit. Learners can be given a longer duration or one time extension. Unlimited sessions are still not supported.
+
 ## When it matters
 A customer asks whether learners can have indefinite access to a lab or learning path.
 

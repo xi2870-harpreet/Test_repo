@@ -22,5 +22,8 @@ No. Cleanup scripts in Labs are per task. There is no equivalent yet to the Trac
 
 Support told the customer Tracks remain supported until 27 September 2027, so they can stay on Tracks. No timeline for a Labs equivalent. The request was passed to the product team as customer insight.
 
+## Update (ticket 4613, closed 2026-11-26)
+Support said page setup and cleanup scripts are still in development and were documented prematurely; the docs page was to be removed until the feature rolls out. The customer used task scripts as the workaround. So a docs mention of page-level setup or cleanup scripts should not be trusted yet.
+
 ## Notes
 One ticket, so Unverified. Check the migration guide (cleanup scripts section) and the launch timeline page before answering; both were cited in the ticket. Do not promise a date. Relevant to the labs2-migrate skill when a track depends on a cleanup script. Customer details left out on purpose.
